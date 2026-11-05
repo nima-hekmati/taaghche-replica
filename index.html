@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="طاقچه - سامانه خرید، دانلود و مطالعه آنلاین کتاب‌های الکترونیکی و صوتی">
+  <title>طاقچه | کتاب الکترونیکی و صوتی</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- سربرگ اصلی سایت -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <!-- لوگو و برند -->
+      <a href="#home" class="brand-logo" id="nav-brand-logo" aria-label="صفحه اصلی طاقچه">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <span>طاقچه</span>
+      </a>
+
+      <!-- نوار جستجوی سربرگ -->
+      <div class="header-search" id="header-search-container" role="search">
+        <form id="header-search-form" action="javascript:void(0);">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+            </svg>
+            <input 
+              type="text" 
+              id="global-search-input" 
+              class="search-input" 
+              placeholder="جستجو در عنوان کتاب و نام نویسنده..." 
+              autocomplete="off"
+              aria-label="جستجوی کتاب"
+            >
+            <button type="button" id="search-clear-btn" class="search-clear-btn" aria-label="پاک کردن متن جستجو">✕</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ناوبری اصلی -->
+      <nav class="main-nav" role="navigation" aria-label="ناوبری اصلی">
+        <a href="#home" class="nav-link" id="nav-link-home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>صفحه اصلی</span>
+        </a>
+        <a href="#catalog" class="nav-link" id="nav-link-catalog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          <span>فهرست کتاب‌ها</span>
+        </a>
+        <a href="#library" class="nav-link" id="nav-link-library">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+          <span>کتابخانه من</span>
+          <span class="badge-count" id="header-library-count">۰</span>
+        </a>
+      </nav>
+
+      <!-- اقدامات کاربری سربرگ -->
+      <div class="header-actions">
+        <div id="user-logged-out-box">
+          <button type="button" class="btn btn-outline" id="btn-open-login" aria-haspopup="dialog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span>ورود / ثبت‌نام</span>
+          </button>
+        </div>
+        <div id="user-logged-in-box" style="display: none; align-items: center; gap: 8px;">
+          <div class="user-menu-btn">
+            <div class="user-avatar" id="header-user-avatar" aria-hidden="true">ک</div>
+            <span id="header-user-name">کاربر</span>
+          </div>
+          <button type="button" class="btn-logout" id="btn-logout" aria-label="خروج از حساب کاربری">خروج</button>
+        </div>
+
+        <!-- دکمه منوی موبایل -->
+        <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-label="منوی موبایل" aria-expanded="false">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ریشه اصلی اپلیکیشن (صفحات و نماها) -->
+  <main id="app-root" role="main">
+    
+    <!-- ==================== نمای صفحه اصلی ==================== -->
+    <div id="view-home" class="app-view">
+      <div class="container">
+        
+        <!-- بنر تبلیغاتی اسلایدر -->
+        <section class="banner-section" aria-label="پیشنهادهای ویژه">
+          <div class="banner-carousel-wrapper">
+            <div class="banner-slides-track" id="banner-slides-track">
+              <!-- بنرها توسط جاوااسکریپت درج می‌شوند -->
+            </div>
+            <div class="banner-controls">
+              <button type="button" class="banner-arrow-btn" id="banner-prev-btn" aria-label="اسلاید قبلی">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
+              <button type="button" class="banner-arrow-btn" id="banner-next-btn" aria-label="اسلاید بعدی">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+              </button>
+            </div>
+            <div class="banner-indicators" id="banner-indicators">
+              <!-- نقاط اندیکاتور -->
+            </div>
+          </div>
+        </section>
+
+        <!-- بخش دسته‌بندی‌ها -->
+        <section class="categories-section" aria-label="دسته‌بندی‌های موضوعی">
+          <div class="section-header">
+            <h2 class="section-title">دسته‌بندی‌های محبوب</h2>
+            <a href="#catalog" class="section-view-all">مشاهده همه کتاب‌ها ←</a>
+          </div>
+          <div class="categories-grid" id="home-categories-grid">
+            <!-- تراشه‌های دسته‌بندی با JS اضافه می‌شوند -->
+          </div>
+        </section>
+
+        <!-- ردیف ۱: پیشنهادهای طاقچه -->
+        <section class="shelf-section" id="shelf-featured" aria-label="پیشنهادهای طاقچه">
+          <div class="section-header">
+            <h2 class="section-title">پیشنهادهای طاقچه</h2>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <a href="#catalog" class="section-view-all" data-shelf-filter="featured">مشاهده همه ←</a>
+              <div class="shelf-controls">
+                <button type="button" class="shelf-arrow-btn" data-shelf-prev="shelf-featured-track" aria-label="کتاب‌های قبلی">›</button>
+                <button type="button" class="shelf-arrow-btn" data-shelf-next="shelf-featured-track" aria-label="کتاب‌های بعدی">‹</button>
+              </div>
+            </div>
+          </div>
+          <div class="shelf-carousel">
+            <div class="shelf-track" id="shelf-featured-track">
+              <!-- کارت‌های کتاب درج می‌شوند -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ردیف ۲: تازه‌های نشر -->
+        <section class="shelf-section" id="shelf-new" aria-label="تازه‌های نشر">
+          <div class="section-header">
+            <h2 class="section-title">تازه‌های نشر</h2>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <a href="#catalog" class="section-view-all" data-shelf-filter="new">مشاهده همه ←</a>
+              <div class="shelf-controls">
+                <button type="button" class="shelf-arrow-btn" data-shelf-prev="shelf-new-track" aria-label="کتاب‌های قبلی">›</button>
+                <button type="button" class="shelf-arrow-btn" data-shelf-next="shelf-new-track" aria-label="کتاب‌های بعدی">‹</button>
+              </div>
+            </div>
+          </div>
+          <div class="shelf-carousel">
+            <div class="shelf-track" id="shelf-new-track">
+              <!-- کارت‌های کتاب درج می‌شوند -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ردیف ۳: کتاب‌های رایگان -->
+        <section class="shelf-section" id="shelf-free" aria-label="کتاب‌های رایگان">
+          <div class="section-header">
+            <h2 class="section-title">کتاب‌های رایگان</h2>
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <a href="#catalog" class="section-view-all" data-shelf-filter="free">مشاهده همه ←</a>
+              <div class="shelf-controls">
+                <button type="button" class="shelf-arrow-btn" data-shelf-prev="shelf-free-track" aria-label="کتاب‌های قبلی">›</button>
+                <button type="button" class="shelf-arrow-btn" data-shelf-next="shelf-free-track" aria-label="کتاب‌های بعدی">‹</button>
+              </div>
+            </div>
+          </div>
+          <div class="shelf-carousel">
+            <div class="shelf-track" id="shelf-free-track">
+              <!-- کارت‌های کتاب درج می‌شوند -->
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ==================== نمای فهرست کتاب‌ها و جستجو ==================== -->
+    <div id="view-catalog" class="app-view" style="display: none;">
+      <div class="container catalog-section">
+        
+        <div class="catalog-header">
+          <nav class="catalog-breadcrumb" aria-label="مسیر راهنما">
+            <a href="#home">صفحه اصلی</a>
+            <span>/</span>
+            <span style="color: var(--text-primary); font-weight: 500;">فهرست کتاب‌ها</span>
+          </nav>
+          <div class="catalog-title-bar">
+            <h1 style="font-size: 1.6rem; font-weight: 700;">فهرست و جستجوی کتاب‌ها</h1>
+          </div>
+        </div>
+
+        <div class="catalog-layout">
+          <!-- نوار کناری فیلترها -->
+          <aside class="filters-sidebar" aria-label="فیلترهای جستجو">
+            <div class="filters-header">
+              <h3>فیلترها</h3>
+              <button type="button" class="clear-filters-btn" id="btn-clear-all-filters">پاک کردن فیلترها</button>
+            </div>
+
+            <!-- فیلتر بر اساس دسته -->
+            <div class="filter-group">
+              <h4 class="filter-group-title">دسته‌بندی موضوعی</h4>
+              <div class="filter-options-list" id="filter-categories-list">
+                <!-- گزینه‌های رادیویی با JS اضافه می‌شوند -->
+              </div>
+            </div>
+
+            <!-- فیلتر بر اساس قیمت -->
+            <div class="filter-group">
+              <h4 class="filter-group-title">نوع قیمت</h4>
+              <div class="filter-options-list">
+                <label class="filter-radio-label">
+                  <input type="radio" name="filter-price" value="all" checked>
+                  <span>همه کتاب‌ها</span>
+                </label>
+                <label class="filter-radio-label">
+                  <input type="radio" name="filter-price" value="free">
+                  <span>فقط کتاب‌های رایگان</span>
+                </label>
+                <label class="filter-radio-label">
+                  <input type="radio" name="filter-price" value="paid">
+                  <span>فقط کتاب‌های غیررایگان (پولی)</span>
+                </label>
+              </div>
+            </div>
+          </aside>
+
+          <!-- محتوای نتایج -->
+          <div class="catalog-content">
+            <!-- نوار مرتب‌سازی و آمار -->
+            <div class="catalog-toolbar">
+              <div class="results-count">
+                تعداد نتایج: <strong id="catalog-count-badge">۰</strong> کتاب
+              </div>
+              <div class="sort-container">
+                <label for="catalog-sort-select" class="sort-label">مرتب‌سازی بر اساس:</label>
+                <select id="catalog-sort-select" class="sort-select" aria-label="مرتب‌سازی نتایج">
+                  <option value="default">پیش‌فرض طاقچه</option>
+                  <option value="rating-desc">بیشترین امتیاز (محبوب‌ترین)</option>
+                  <option value="price-asc">ارزان‌ترین قیمت</option>
+                  <option value="price-desc">گران‌ترین قیمت</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- شبکه کارت‌های کتاب -->
+            <div class="catalog-books-grid" id="catalog-books-grid">
+              <!-- کارت‌ها در این بخش درج می‌شوند -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== نمای جزییات کتاب ==================== -->
+    <div id="view-book" class="app-view" style="display: none;">
+      <div class="container book-details-section">
+        
+        <nav class="catalog-breadcrumb" aria-label="مسیر راهنما">
+          <a href="#home">صفحه اصلی</a>
+          <span>/</span>
+          <a href="#catalog">فهرست کتاب‌ها</a>
+          <span>/</span>
+          <span id="book-detail-breadcrumb" style="color: var(--text-primary); font-weight: 500;">نام کتاب</span>
+        </nav>
+
+        <div id="book-detail-content-area">
+          <!-- محتوای جزییات با جاوااسکریپت بارگذاری می‌شود -->
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== نمای کتابخانه من ==================== -->
+    <div id="view-library" class="app-view" style="display: none;">
+      <div class="container library-section">
+        
+        <div class="catalog-header">
+          <nav class="catalog-breadcrumb" aria-label="مسیر راهنما">
+            <a href="#home">صفحه اصلی</a>
+            <span>/</span>
+            <span style="color: var(--text-primary); font-weight: 500;">کتابخانه من</span>
+          </nav>
+          <h1 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 8px;">کتابخانه و علاقه‌مندی‌ها</h1>
+          <p style="color: var(--text-secondary); font-size: 0.95rem;">کتاب‌های دریافت‌شده و نشان‌شده‌های شما به صورت پایدار در این بخش قرار دارند.</p>
+        </div>
+
+        <div class="library-tabs" role="tablist">
+          <button type="button" class="library-tab-btn active" id="tab-btn-purchased" role="tab" aria-selected="true">
+            <span>کتاب‌های دریافت‌شده (من)</span>
+            <span class="badge-count" id="library-purchased-count">۰</span>
+          </button>
+          <button type="button" class="library-tab-btn" id="tab-btn-favorites" role="tab" aria-selected="false">
+            <span>نشان‌شده‌ها (علاقه‌مندی‌ها)</span>
+            <span class="badge-count" id="library-favorites-count">۰</span>
+          </button>
+        </div>
+
+        <!-- شبکه کتاب‌های کتابخانه -->
+        <div class="catalog-books-grid" id="library-books-grid">
+          <!-- کتاب‌های کتابخانه درج می‌شوند -->
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ==================== نمای مطالعه نمونه کتاب ==================== -->
+    <div id="view-reader" class="app-view" style="display: none;">
+      <div class="reader-container" id="reader-container">
+        
+        <header class="reader-header">
+          <div class="reader-title-box">
+            <button type="button" class="btn btn-outline" id="btn-reader-exit" aria-label="خروج از مطالعه و بازگشت به جزییات کتاب">
+              ✕ خروج از مطالعه
+            </button>
+            <span id="reader-header-book-title" style="font-weight: 700; font-size: 1.05rem;">عنوان کتاب</span>
+          </div>
+
+          <div class="reader-tools">
+            <!-- تغییر اندازه قلم -->
+            <div class="reader-tool-group" aria-label="تنظیم اندازه قلم">
+              <button type="button" class="reader-tool-btn" data-font-size="sm">کوچک</button>
+              <button type="button" class="reader-tool-btn active" data-font-size="md">متوسط</button>
+              <button type="button" class="reader-tool-btn" data-font-size="lg">بزرگ</button>
+            </div>
+
+            <!-- تغییر تم مطالعه -->
+            <div class="reader-tool-group" aria-label="تنظیم تم مطالعه">
+              <button type="button" class="reader-tool-btn active" data-theme="light">روشن</button>
+              <button type="button" class="reader-tool-btn" data-theme="dark">تیره</button>
+              <button type="button" class="reader-tool-btn" data-theme="sepia">کاغذی</button>
+            </div>
+          </div>
+        </header>
+
+        <main class="reader-content-wrapper">
+          <div class="reader-book-meta">
+            <h1 class="reader-book-title" id="reader-title">عنوان کتاب</h1>
+            <p class="reader-book-author" id="reader-author">نویسنده</p>
+          </div>
+          <div class="reader-paragraphs font-size-md" id="reader-paragraphs-body">
+            <!-- پاراگراف‌های متنی کتاب -->
+          </div>
+        </main>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ==================== مودال ورود کاربر ==================== -->
+  <div class="modal-overlay" id="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="login-modal-title">ورود به طاقچه</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-login" aria-label="بستن پنجره">✕</button>
+      </div>
+      <form id="login-form" novalidate>
+        <div class="modal-body">
+          <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 20px;">
+            برای دریافت و خرید کتاب و ثبت در کتابخانه خود، لطفاً اطلاعات زیر را وارد نمایید:
+          </p>
+          
+          <div class="form-group">
+            <label for="input-user-name" class="form-label">نام و نام خانوادگی / نام نمایشی *</label>
+            <input 
+              type="text" 
+              id="input-user-name" 
+              class="form-input" 
+              placeholder="مثال: علی احمدی" 
+              required
+            >
+            <span class="form-error-msg" id="error-user-name">لطفاً نام نمایشی خود را وارد کنید.</span>
+          </div>
+
+          <div class="form-group">
+            <label for="input-user-phone" class="form-label">شماره تلفن همراه *</label>
+            <input 
+              type="tel" 
+              id="input-user-phone" 
+              class="form-input" 
+              placeholder="مثال: 09123456789" 
+              dir="ltr" 
+              maxlength="11" 
+              required
+            >
+            <span class="form-error-msg" id="error-user-phone">شماره همراه باید دقیقاً ۱۱ رقم بوده و با ۰۹ آغاز شود (ارقام فارسی و لاتین معتبرند).</span>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" id="btn-cancel-login">انصراف</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-login">ورود به حساب</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== مودال تایید خرید کتاب ==================== -->
+  <div class="modal-overlay" id="purchase-modal" role="dialog" aria-modal="true" aria-labelledby="purchase-modal-title">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="purchase-modal-title">تایید خرید شبیه‌سازی‌شده</h3>
+        <button type="button" class="modal-close-btn" id="btn-close-purchase" aria-label="بستن پنجره">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.95rem; margin-bottom: 16px; color: var(--text-primary);">
+          شما در حال افزودن کتاب زیر به کتابخانه دیجیتال خود هستید:
+        </p>
+        <div style="background-color: var(--bg-surface-alt); padding: 16px; border-radius: var(--radius-md); margin-bottom: 18px;">
+          <h4 id="purchase-book-title" style="font-size: 1.05rem; font-weight: 700; margin-bottom: 6px;">عنوان کتاب</h4>
+          <p id="purchase-book-author" style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 12px;">نویسنده</p>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border-light); padding-top: 10px;">
+            <span style="font-size: 0.9rem; color: var(--text-secondary);">مبلغ قابل پرداخت:</span>
+            <strong id="purchase-book-price" style="font-size: 1.1rem; color: var(--primary);">۰ تومان</strong>
+          </div>
+        </div>
+        <p style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.6;">
+          * توجه: این فرایند یک شبیه‌سازی محلی برای تکلیف دانشگاه است و هیچ‌گونه تراکنش مالی واقعی یا اتصال به درگاه پرداخت انجام نمی‌گیرد.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline" id="btn-cancel-purchase">انصراف</button>
+        <button type="button" class="btn btn-primary" id="btn-confirm-purchase">تایید و افزودن به کتابخانه</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- کانتینر پیام‌های شناور توست -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- پاورقی سایت -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-about">
+          <h4>سامانه کتابخوان طاقچه</h4>
+          <p>
+            پروژه تمرین اول درس برنامه‌سازی وب (نیم‌سال پاییز ۱۴۰۴/۱۴۰۵) - دانشکده مهندسی کامپیوتر دانشگاه صنعتی شریف. طراحی‌شده با الهام از ساختار و رابط کاربری وب‌سایت طاقچه به صورت خالص و بدون وابستگی جانبی.
+          </p>
+        </div>
+        <div class="footer-col">
+          <h5>دسترسی سریع</h5>
+          <ul class="footer-links-list">
+            <li><a href="#home">صفحه اصلی</a></li>
+            <li><a href="#catalog">فهرست همه کتاب‌ها</a></li>
+            <li><a href="#library">کتابخانه و علاقه‌مندی‌ها</a></li>
+            <li><a href="#catalog" data-shelf-filter="free">کتاب‌های رایگان</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>راهنما و خدمات</h5>
+          <ul class="footer-links-list">
+            <li><a href="javascript:void(0);" onclick="alert('این سامانه یک پروژه دانشگاهی است.');">درباره پروژه</a></li>
+            <li><a href="javascript:void(0);" onclick="alert('پرسش‌های متداول در فایل README.md توضیح داده شده‌اند.');">پرسش‌های متداول</a></li>
+            <li><a href="javascript:void(0);" onclick="localStorage.clear(); location.reload();">پاک کردن وضعیت مرورگر (Reset)</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h5>اطلاعات درس</h5>
+          <p style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.8;">
+            <strong>استاد درس:</strong> علی ابریشمی<br>
+            <strong>طراحان تمرین:</strong> مهبد خالقی، محمدحسین شفاعت، مانی ابراهیمی<br>
+            <strong>فناوری:</strong> Pure HTML5 / CSS3 / Vanilla JS
+          </p>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© تمامی حقوق برای پروژه برنامه‌سازی وب دانشگاه شریف محفوظ است.</span>
+        <span>طراحی‌شده بر اساس استانداردهای وب و دسترس‌پذیری</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- اسکریپت داده‌ها و منطق برنامه -->
+  <script src="js/books.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
