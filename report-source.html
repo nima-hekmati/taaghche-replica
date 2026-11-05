@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>گزارش تمرین اول برنامه‌سازی وب - سامانه کتابخوان طاقچه</title>
+  <style>
+    @font-face {
+      font-family: 'Vazirmatn';
+      src: url('assets/fonts/Vazirmatn-Regular.woff2') format('woff2');
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: 'Vazirmatn';
+      src: url('assets/fonts/Vazirmatn-Medium.woff2') format('woff2');
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: 'Vazirmatn';
+      src: url('assets/fonts/Vazirmatn-Bold.woff2') format('woff2');
+      font-weight: 700;
+    }
+
+    @page {
+      size: A4;
+      margin: 18mm 15mm 20mm 15mm;
+      @bottom-center {
+        content: counter(page);
+        font-family: 'Vazirmatn', sans-serif;
+        font-size: 10pt;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Vazirmatn', Tahoma, sans-serif;
+      font-size: 11pt;
+      line-height: 1.8;
+      color: #1e293b;
+      background-color: #ffffff;
+      direction: rtl;
+      text-align: justify;
+    }
+
+    .page-break {
+      page-break-before: always;
+    }
+
+    /* صفحه جلد گزارش */
+    .cover-container {
+      height: 920px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border: 3px double #00a693;
+      padding: 40px;
+      border-radius: 12px;
+      text-align: center;
+      background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 40%);
+    }
+
+    .cover-header h3 {
+      font-size: 14pt;
+      color: #475569;
+      margin-bottom: 6px;
+    }
+
+    .cover-header h4 {
+      font-size: 12pt;
+      color: #64748b;
+      font-weight: normal;
+    }
+
+    .cover-center {
+      margin: 60px 0;
+    }
+
+    .cover-title {
+      font-size: 26pt;
+      font-weight: 700;
+      color: #008f7e;
+      margin-bottom: 12px;
+    }
+
+    .cover-subtitle {
+      font-size: 15pt;
+      color: #334155;
+      font-weight: 500;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 24px;
+      background-color: #00a693;
+      color: #ffffff;
+      font-size: 12pt;
+      font-weight: bold;
+      border-radius: 20px;
+    }
+
+    .cover-meta {
+      background-color: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px;
+      text-align: right;
+      font-size: 11pt;
+      line-height: 2.2;
+    }
+
+    /* بخش‌های درونی گزارش */
+    .section-title {
+      font-size: 16pt;
+      font-weight: 700;
+      color: #008f7e;
+      border-bottom: 2px solid #00a693;
+      padding-bottom: 8px;
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+
+    .subsection-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 18px;
+      margin-bottom: 10px;
+    }
+
+    p {
+      margin-bottom: 12px;
+    }
+
+    .highlight-box {
+      background-color: #f0fdfa;
+      border-right: 4px solid #00a693;
+      padding: 12px 18px;
+      border-radius: 0 8px 8px 0;
+      margin: 14px 0;
+      font-size: 10.5pt;
+    }
+
+    .table-custom {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 18px 0;
+      font-size: 9.5pt;
+    }
+
+    .table-custom th, .table-custom td {
+      border: 1px solid #cbd5e1;
+      padding: 8px 10px;
+      text-align: right;
+    }
+
+    .table-custom th {
+      background-color: #00a693;
+      color: #ffffff;
+      font-weight: 700;
+    }
+
+    .table-custom tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+
+    .img-reference-box {
+      text-align: center;
+      margin: 16px 0;
+      page-break-inside: avoid;
+    }
+
+    .img-reference-box img {
+      max-width: 95%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .img-caption {
+      font-size: 9pt;
+      color: #64748b;
+      margin-top: 6px;
+    }
+
+    ul, ol {
+      margin-right: 24px;
+      margin-bottom: 14px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    code {
+      font-family: monospace;
+      background-color: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0f172a;
+      font-size: 9.5pt;
+      direction: ltr;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==================== صفحه ۱: جلد گزارش ==================== -->
+  <div class="cover-container">
+    <div class="cover-header">
+      <h3>دانشگاه صنعتی شریف</h3>
+      <h4>دانشکده مهندسی کامپیوتر</h4>
+      <h4>درس برنامه‌سازی وب — نیم‌سال پاییز ۱۴۰۴/۱۴۰۵</h4>
+    </div>
+
+    <div class="cover-center">
+      <h1 class="cover-title">گزارش پیاده‌سازی و آزمون</h1>
+      <h2 class="cover-subtitle">سامانه کتابخوان دیجیتال و فروشگاه آنلاین طاقچه</h2>
+      <div class="cover-badge">تمرین اول (HW1) — ۱۰۰۰ امتیاز</div>
+    </div>
+
+    <div class="cover-meta">
+      <p><strong>استاد درس:</strong> جناب آقای دکتر علی ابریشمی</p>
+      <p><strong>طراحان تمرین:</strong> مهبد خالقی، محمدحسین شفاعت، مانی ابراهیمی</p>
+      <p><strong>نام دانشجو:</strong> نیما حکمتی فرید</p>
+      <p><strong>فناوری‌های به‌کاررفته:</strong> Pure HTML5 / CSS3 / Vanilla JavaScript (بدون هیچ فریم‌ورک یا کتابخانه خارجی)</p>
+      <p><strong>تاریخ تدوین گزارش:</strong> ۱۴ آبان ۱۴۰۴ (۵ نوامبر ۲۰۲۵)</p>
+    </div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== صفحه ۲: معرفی، اهداف و تصاویر مرجع ==================== -->
+  <h2 class="section-title">۱. معرفی سازنده و اهداف پروژه</h2>
+  <p>
+    این پروژه با هدف بازآفرینی تجربه کاربری و قابلیت‌های اصلی سامانه کتابخوان <strong>طاقچه</strong> در چارچوب تمرین اول درس برنامه‌سازی وب دانشگاه صنعتی شریف پیاده‌سازی شده است. تمرکز محوری این تمرین بر تسلط عمیق بر استانداردهای اصیل وب (HTML معنایی، CSS پیشرفته، مدیریت حالت و مسیریابی با JavaScript خام) و پرهیز کامل از فریم‌ورک‌ها و کتابخانه‌های جانبی استوار بوده است.
+  </p>
+  <div class="highlight-box">
+    <strong>ویژگی‌های کلیدی پروژه:</strong> طراحی کاملاً فارسی و راست‌به‌چپ (RTL)، ساختار بدون وابستگی (Zero Dependencies)، پشتیبانی از ذخیره‌سازی محلی و ماندگار (LocalStorage)، خواننده اختصاصی متن، و انطباق کامل با استانداردهای واکنش‌گرایی در عرض‌های ۳۶۰، ۷۶۸ و ۱۴۴۰ پیکسل.
+  </div>
+
+  <h2 class="section-title">۲. تصاویر مرجع طاقچه با تاریخ مشاهده</h2>
+  <p>
+    طبق بند ۱ و ۵ راهنمای تمرین، ۳ نمای مرجع از وب‌سایت طاقچه شامل صفحه اصلی، فهرست کتاب‌ها و صفحه جزییات همراه با تاریخ مشاهده استخراج گردید تا به عنوان مبنای چیدمان، سلسله‌مراتب و هویت بصری پروژه مورد استفاده قرار گیرند.
+  </p>
+
+  <div class="img-reference-box">
+    <img src="assets/references/reference-taaghche-home.png" alt="مرجع بصری صفحه اصلی طاقچه">
+    <div class="img-caption">تصویر مرجع ۱: صفحه اصلی طاقچه (تاریخ مشاهده: ۱۴ آبان ۱۴۰۴) — ساختار سربرگ، بنرهای اسلایدر و قفسه‌های افقی</div>
+  </div>
+
+  <div class="img-reference-box">
+    <img src="assets/references/reference-taaghche-catalog.png" alt="مرجع بصری فهرست و جستجوی طاقچه">
+    <div class="img-caption">تصویر مرجع ۲: فهرست و فیلترهای طاقچه (تاریخ مشاهده: ۱۴ آبان ۱۴۰۴) — سایدبار فیلترهای چندگانه و گرید کتاب‌ها</div>
+  </div>
+
+  <div class="page-break"></div>
+
+  <div class="img-reference-box">
+    <img src="assets/references/reference-taaghche-details.png" alt="مرجع بصری جزییات کتاب طاقچه">
+    <div class="img-caption">تصویر مرجع ۳: صفحه معرفی و مشخصات کتاب (تاریخ مشاهده: ۱۴ آبان ۱۴۰۴) — کارت مشخصات، دکمه‌های دریافت و مطالعه نمونه</div>
+  </div>
+
+  <h2 class="section-title">۳. روند واقعی ساخت و معماری گام‌به‌گام</h2>
+  <p>
+    فرایند توسعه برنامه مطابق اصول مهندسی نرم‌افزار ایجنتی و راهنمای تمرین به صورت فازهای مستقل و روی نتایج گام قبل به شرح زیر اجرا شد:
+  </p>
+  <ul>
+    <li><strong>گام ۱ (طراحی مدل داده و فایل‌های پایه):</strong> ایجاد آرایه غنی از ۱۵ عنوان کتاب در ۴ دسته‌بندی با مشخصات شناسنامه‌ای کامل، تولید تصاویر برداری SVG اختصاصی برای جلدها و کپی فونت محلی وزیرمتن جهت استقلال کامل از شبکه.</li>
+    <li><strong>گام ۲ (سامانه طراحی و CSS خالص):</strong> پایه‌ریزی متغیرهای طراحی (CSS Variables)، پالت رنگی فیروزه‌ای اختصاصی طاقچه، استایل‌دهی کارت‌ها، اسلایدرها، فرم‌ها و سیستم گرید.</li>
+    <li><strong>گام ۳ (صفحه اصلی و قفسه‌ها):</strong> پیاده‌سازی اسلایدر بنرهای متحرک با کنترل‌های قبلی/بعدی، تراشه‌های تعاملی دسته‌بندی و ۳ ردیف مجزای کتاب (پیشنهادها، تازه‌ها و رایگان‌ها) با دکمه‌های پیمایش افقی.</li>
+    <li><strong>گام ۴ (فهرست، جستجو و فیلتر ترکیبی):</strong> توسعه موتور فیلترینگ چندمعیاره برخط با همگام‌سازی بی‌درنگ جستجوی متنی، فیلتر دسته، فیلتر قیمت و مرتب‌سازی سه‌گانه بدون تاخیر.</li>
+    <li><strong>گام ۵ (صفحه جزییات و روتر پویا):</strong> ناوبری بر پایه <code>hash</code> و <code>URLSearchParams</code> جهت امکان بوک‌مارک و باز کردن مستقیم در زبانه جدید، همراه با مدیریت خطای شناسه نامعتبر و قفسه کتاب‌های مرتبط.</li>
+    <li><strong>گام ۶ (کتابخانه، احراز هویت و پایداری):</strong> فرم ورود دو مرحله‌ای با اعتبارسنجی ۱۱ رقمی شماره همراه و پشتیبانی ارقام فارسی، دیالوگ تایید خرید شبیه‌سازی‌شده و پایداری در <code>localStorage</code>.</li>
+    <li><strong>گام ۷ (نمونه مطالعه و واکنش‌گرایی):</strong> خواننده اختصاصی متمرکز با قابلیت تنظیم ۳ اندازه قلم و ۳ تم رنگی، تست واکنش‌گرایی در عرض‌های ۳۶۰، ۷۶۸ و ۱۴۴۰ پیکسل و پشتیبانی کامل کیبورد (کلید Escape).</li>
+  </ul>
+
+  <div class="page-break"></div>
+
+  <h2 class="section-title">۴. توضیح ساختار داده و منطق جستجو و ذخیره‌سازی</h2>
+  <h3 class="subsection-title">۴.۱. ساختار داده کتاب‌ها (Data Structure)</h3>
+  <p>
+    تمام کتاب‌ها در آرایه‌ای به نام <code>BOOKS_DATA</code> در فایل <code>js/books.js</code> نگهداری می‌شوند. هر آبجکت کتاب شامل فیلدهای استاندارد زیر است:
+  </p>
+  <ul>
+    <li><code>id</code> (رشته یکتا، مانند <code>book-1</code>)</li>
+    <li><code>title</code> و <code>author</code> (عنوان و نام نویسنده به فارسی)</li>
+    <li><code>category</code> (دسته‌بندی موضوعی نظیر «داستان و رمان»، «روانشناسی»، «مدیریت»، «فلسفه»)</li>
+    <li><code>cover</code> (مسیر نسبی تصویر جلد وکتور SVG)</li>
+    <li><code>price</code> (عدد صحیح به تومان؛ عدد <code>0</code> نشان‌دهنده کتاب رایگان است)</li>
+    <li><code>rating</code> (عدد اعشاری از ۵)</li>
+    <li><code>sampleText</code> (آرایه‌ای از ۳ الی ۴ بند متنی برای مطالعه در بخش کتابخوان)</li>
+    <li>مشخصات شناسنامه‌ای: <code>publisher</code>، <code>publishYear</code>، <code>pages</code> و <code>format</code></li>
+  </ul>
+
+  <h3 class="subsection-title">۴.۲. منطق جستجو و نرمال‌سازی فارسی</h3>
+  <p>
+    تابع <code>normalizePersian</code> متن ورودی کاربر و عناوین را قبل از تطبیق پردازش می‌کند:
+  </p>
+  <ul>
+    <li>حذف فاصله‌های ابتدا و انتها با <code>trim()</code></li>
+    <li>تبدیل حروف عربی متداول مانند <code>ي</code> به <code>ی</code> و <code>ك</code> به <code>ک</code></li>
+    <li>حذف نیم‌فاصله‌های نامرئی (Zero-width characters) جهت تطبیق پذیری یکنواخت</li>
+    <li>جستجوی همزمان در هر دو فیلد <code>title</code> و <code>author</code> به صورت ترکیبی با فیلترهای دسته و قیمت</li>
+  </ul>
+
+  <h3 class="subsection-title">۴.۳. منطق ذخیره‌سازی و پایداری محلی (Storage Logic)</h3>
+  <p>
+    چهار کلید مجزا در <code>localStorage</code> برای حفظ وضعیت تعریف شده‌اند:
+  </p>
+  <ul>
+    <li><code>taaghche_current_user</code>: مشخصات کاربر وارد شده شامل نام و شماره تلفن</li>
+    <li><code>taaghche_purchased_books</code>: آرایه شناسه‌های کتاب‌های دریافت‌شده یا خریداری‌شده</li>
+    <li><code>taaghche_favorite_books</code>: آرایه شناسه‌های کتاب‌های نشان‌شده (علاقه‌مندی‌ها)</li>
+    <li><code>taaghche_reader_settings</code>: آبجکت تنظیمات فونت و تم کتابخوان</li>
+  </ul>
+  <p>
+    تمام عملیات خواندن درون بلوک‌های <code>try / catch</code> قرار دارند تا در صورت آسیب‌دیدگی یا خالی بودن دیتای مرورگر، برنامه با مقادیر پیش‌فرض پایدار به کار خود ادامه دهد و هیچ خطایی عملکرد کل سایت را متوقف نکند.
+  </p>
+
+  <h2 class="section-title">۵. چالش‌های فنی و راه‌حل‌ها</h2>
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th style="width: 25%;">چالش فنی</th>
+        <th style="width: 35%;">ریشه و حساسیت مسئله</th>
+        <th style="width: 40%;">راه‌حل پیاده‌سازی‌شده</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>استقلال کامل از فونت و شبکه</strong></td>
+        <td>عدم استفاده از CDN یا وب‌فونت‌های خارجی و حفظ ظاهر زیبای فارسی</td>
+        <td>کپی محلی فایل‌های سبک WOFF2 فونت وزیرمتن و لودینگ از طریق <code>@font-face</code> محلی</td>
+      </tr>
+      <tr>
+        <td><strong>امنیت و پیشگیری از XSS</strong></td>
+        <td>الزام عدم استفاده از <code>innerHTML</code> برای متن‌های ورودی کاربر</td>
+        <td>استفاده انحصاری از <code>textContent</code> و ساخت المان‌های امن DOM در جاوااسکریپت</td>
+      </tr>
+      <tr>
+        <td><strong>اعتبارسنجی ارقام فارسی و انگلیسی</strong></td>
+        <td>کاربران ممکن است شماره موبایل را با کیبورد فارسی یا لاتین تایپ کنند</td>
+        <td>توسعه تابع <code>toEnglishDigits</code> که تمام ارقام فارسی و عربی را پیش از Regex تبدیل می‌کند</td>
+      </tr>
+      <tr>
+        <td><strong>عدم ثبت تکراری در کتابخانه</strong></td>
+        <td>خرید مجدد یا کلیک مکرر کاربر نباید کتاب را دو بار به کتابخانه اضافه کند</td>
+        <td>بررسی وجود شناسه با <code>includes()</code> و تغییر برچسب دکمه به «در کتابخانه شما موجود است»</td>
+      </tr>
+      <tr>
+        <td><strong>مسیریابی پایدار و رفرش</strong></td>
+        <td>باز شدن لینک مستقیم کتاب در تب جدید یا رفرش مرورگر</td>
+        <td>پشتیبانی دوگانه از پارامترهای <code>URLSearchParams</code> و <code>window.location.hash</code></td>
+      </tr>
+      <tr>
+        <td><strong>دسترس‌پذیری و بستن پنجره‌ها</strong></td>
+        <td>بستن مودال‌ها با کلید Escape و هدایت مجدد فوکوس</td>
+        <td>شنونده سراسری <code>keydown</code> و ذخیره <code>lastFocusedElement</code> جهت بازگرداندن فوکوس</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+
+  <!-- ==================== صفحه ۴: جدول آزمون‌های نهایی بخش ۶ ==================== -->
+  <h2 class="section-title">۶. جدول آزمون‌های نهایی (مطابق بخش ۶ صورت تمرین)</h2>
+  <p>
+    تمام آزمون‌های هفت‌گانه اعلام‌شده در بخش ششم سند تمرین با دقت و جامعیت مورد ارزیابی قرار گرفتند:
+  </p>
+
+  <table class="table-custom">
+    <thead>
+      <tr>
+        <th>ردیف</th>
+        <th>مسیر و اقدام آزمون</th>
+        <th>ورودی داده شده</th>
+        <th>رفتار مورد انتظار</th>
+        <th>نتیجه مشاهده‌شده در عمل</th>
+        <th>وضعیت</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>۱</strong></td>
+        <td>صفحه اصلی، بنر، دسته‌ها و پیوندها</td>
+        <td>باز کردن اولیه <code>index.html</code></td>
+        <td>نمایش کامل بنر، ۳ ردیف کتاب اسکرولی، دکمه‌های قبلی/بعدی</td>
+        <td>تمام بنرها، ۴ دسته و ۳ قفسه کتاب بدون نقص رندر شدند</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۲</strong></td>
+        <td>جستجوی ترکیبی و فیلترها</td>
+        <td>جستجوی «صادق»، فیلتر رایگان، مرتب‌سازی ارزان‌ترین</td>
+        <td>فیلتر همزمان، به‌روزرسانی شمارنده و نمایش «بوف کور»</td>
+        <td>شمارنده ۱ نتیجه نشان داد؛ با پاک کردن فیلترها همه برگشتند</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۳</strong></td>
+        <td>آزمون حالت بدون نتیجه (Empty State)</td>
+        <td>جستجوی عبارت ناموجود «xyz999»</td>
+        <td>نمایش پیام واضح و دکمه بازگشت به فهرست</td>
+        <td>کارت هشدار با دکمه پاک کردن فیلترها با موفقیت نمایان شد</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۴</strong></td>
+        <td>شناسه مستقیم و شناسه نامعتبر</td>
+        <td>باز کردن <code>#book?id=book-1</code> و سپس <code>id=invalid-99</code></td>
+        <td>نمایش کامل بوف کور و سپس نمایش پیام «کتاب یافت نشد»</td>
+        <td>جزییات با رفرش باقی ماند؛ شناسه خراب دکمه بازگشت داد</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۵</strong></td>
+        <td>ورود کاربر و دریافت/خرید کتاب</td>
+        <td>ورود با نام «نیما» و شماره «۰۹۱۲۳۴۵۶۷۸۹»، خرید کتاب</td>
+        <td>اعتبارسنجی ۱۱ رقمی، تایید خرید و جلوگیری از ثبت تکراری</td>
+        <td>کاربر ثبت شد، نام در سربرگ نشست و کتاب در کتابخانه قرار گرفت</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۶</strong></td>
+        <td>نشان‌کردن و حذف از علاقه‌مندی‌ها</td>
+        <td>نشان‌کردن دو کتاب و حذف یکی، سپس رفرش صفحه</td>
+        <td>پایداری در LocalStorage و به‌روزرسانی شمارنده سربرگ</td>
+        <td>پس از بارگذاری مجدد، کتاب مورد نظر دقیقاً حفظ شده بود</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۷</strong></td>
+        <td>مطالعه نمونه و ماندگاری تنظیمات</td>
+        <td>تغییر فونت به «بزرگ» و تم به «کاغذی (سپیا)»</td>
+        <td>اعمال تغییر و حفظ تنظیمات پس از رفرش صفحه</td>
+        <td>تم و سایز فونت پس از رفرش مجدداً با موفقیت اعمال شدند</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+      <tr>
+        <td><strong>۸</strong></td>
+        <td>ریسپانسیو ۳ عرض و پیمایش کیبورد</td>
+        <td>تست در ۳۶۰px، ۷۶۸px، ۱۴۴۰px و فشردن کلید Escape</td>
+        <td>عدم اسکرول افقی ناخواسته، بستن مودال‌ها با Escape</td>
+        <td>بدون اسکرول افقی اضافی، فوکوس دقیق و بدون خطای کنسولی</td>
+        <td style="color: #16a34a; font-weight: bold;">موفق (PASSED)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2 class="section-title">۷. وضعیت نهایی قابلیت‌ها و منابع</h2>
+  <h3 class="subsection-title">۷.۱. منابع فونت، جلد، متن و آیکون‌ها</h3>
+  <ul>
+    <li><strong>قلم (Font):</strong> فونت متن‌باز وزیرمتن (Vazirmatn) اثر صابر راستی‌کردار — فایل‌های محلی در مسیر <code>assets/fonts/</code>.</li>
+    <li><strong>تصاویر جلد (Book Covers):</strong> ۱۵ فایل برداری SVG اختصاصی تولیدشده در پروژه با پالت‌های رنگی متناسب — در مسیر <code>assets/covers/</code>.</li>
+    <li><strong>متون و توضیحات:</strong> توضیحات کتاب‌ها و متون نمونه چندبندی برگرفته از آثار ادبی مشهور فارسی و ترجمه‌های استاندارد (بوف کور، گلستان سعدی، شازده کوچولو، عادت‌های اتمی و ...).</li>
+    <li><strong>آیکون‌ها:</strong> آیکون‌های برداری استاندارد SVG توکار (بدون استفاده از فونت‌آیکون‌های سنگین یا کتابخانه‌های جانبی).</li>
+  </ul>
+
+  <h3 class="subsection-title">۷.۲. نتیجه‌گیری و حسن ختام</h3>
+  <p>
+    وب‌اپلیکیشن طاقچه با رعایت کامل تمام اصول کدنویسی تمیز، تفکیک کامل لایه‌های داده، منطق و ظاهر و استانداردهای تعیین‌شده در صورت تمرین به پایان رسید. پروژه در قالب ساختاری منسجم، به همراه فایل‌های اجرایی و مستندات تحلیلی در پوشه <code>hw1</code> سازمان‌دهی شده و آماده تحویل نهایی می‌باشد.
+  </p>
+
+</body>
+</html>
