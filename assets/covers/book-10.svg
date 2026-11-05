@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="100%" height="100%">
+  <defs>
+    <linearGradient id="grad_book-10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#263238" />
+      <stop offset="100%" stop-color="#37474f" />
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="560" rx="16" fill="url(#grad_book-10)"/>
+
+  <!-- Decorative geometric spine & border -->
+  <rect x="0" y="0" width="22" height="560" rx="16" fill="#000000" opacity="0.25"/>
+  <line x1="22" y1="0" x2="22" y2="560" stroke="#ffffff" stroke-opacity="0.15" stroke-width="2"/>
+  <rect x="36" y="24" width="340" height="512" rx="10" fill="none" stroke="#80cbc4" stroke-opacity="0.35" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+  <!-- Header Taaghche mark -->
+  <g transform="translate(200, 55)" text-anchor="middle">
+    <text font-family="Vazirmatn, Tahoma, sans-serif" font-size="14" fill="#ffffff" opacity="0.6" letter-spacing="1">نشر دیجیتال طاقچه</text>
+  </g>
+
+  <!-- Category badge -->
+  <g transform="translate(200, 95)">
+    <rect x="-70" y="-14" width="140" height="28" rx="14" fill="#80cbc4" fill-opacity="0.18" stroke="#80cbc4" stroke-width="1"/>
+    <text text-anchor="middle" y="5" font-family="Vazirmatn, Tahoma, sans-serif" font-size="12" font-weight="bold" fill="#80cbc4">روانشناسی و خودیاری</text>
+  </g>
+
+  <!-- Center Symbol Art -->
+  <g transform="translate(200, 210)" text-anchor="middle">
+    <circle r="56" fill="#80cbc4" fill-opacity="0.12" stroke="#80cbc4" stroke-opacity="0.3" stroke-width="2"/>
+    <text y="18" font-size="44">🧠</text>
+  </g>
+
+  <!-- Book Title -->
+  <g transform="translate(200, 320)" text-anchor="middle">
+    <text font-family="Vazirmatn, Tahoma, sans-serif" font-size="24" font-weight="bold" fill="#ffffff" filter="url(#shadow)">تفکر، سریع و کُند</text>
+  </g>
+
+  <!-- Author Name -->
+  <g transform="translate(200, 365)" text-anchor="middle">
+    <text font-family="Vazirmatn, Tahoma, sans-serif" font-size="16" fill="#ffffff" opacity="0.85">دانیل کانمن</text>
+  </g>
+
+  <!-- Decorative divider -->
+  <line x1="120" y1="400" x2="280" y2="400" stroke="#80cbc4" stroke-opacity="0.5" stroke-width="2"/>
+
+  <!-- Ribbon Tag / Badge at bottom right -->
+  <g transform="translate(305, 485)">
+    <rect x="-45" y="-12" width="90" height="24" rx="12" fill="#80cbc4" fill-opacity="0.9"/>
+    <text text-anchor="middle" y="4" font-family="Vazirmatn, Tahoma, sans-serif" font-size="12" font-weight="bold" fill="#111111">نوبل اقتصاد</text>
+  </g>
+
+  <!-- Quality Stamp -->
+  <g transform="translate(95, 485)">
+    <text text-anchor="middle" y="4" font-family="Vazirmatn, Tahoma, sans-serif" font-size="12" fill="#ffffff" opacity="0.7">نسخه کامل</text>
+  </g>
+</svg>
