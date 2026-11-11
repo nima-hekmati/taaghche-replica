@@ -5,3 +5,9 @@ Thumbs.db
 node_modules/
 .idea/
 .vscode/
+template/
+*.aux
+*.log
+*.out
+*.toc
+*.xdv
