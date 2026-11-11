@@ -403,11 +403,235 @@ ul, ol {
   background-color: #fecaca;
 }
 
-/* منوی موبایل */
+/* دکمه‌های جستجو و منوی موبایل */
+.mobile-search-toggle,
 .mobile-menu-toggle {
   display: none;
   align-items: center;
   justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background-color: var(--bg-surface-alt);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mobile-search-toggle:hover,
+.mobile-search-toggle.active,
+.mobile-menu-toggle:hover {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+/* ==========================================================================
+   ۳.۱. منوی کشویی سایدبار موبایل (Mobile Drawer)
+   ========================================================================== */
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg-overlay);
+  backdrop-filter: blur(4px);
+  z-index: 250;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--transition-normal);
+}
+
+.mobile-drawer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 290px;
+  max-width: 84vw;
+  background-color: var(--bg-surface);
+  z-index: 260;
+  transform: translateX(100%);
+  transition: transform var(--transition-normal);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.mobile-drawer.active {
+  transform: translateX(0);
+}
+
+.drawer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.drawer-close-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--text-muted);
+  background-color: var(--bg-surface-alt);
+  border: 1px solid var(--border-light);
+}
+
+.drawer-close-btn:hover {
+  color: var(--text-primary);
+  background-color: var(--border-light);
+}
+
+.drawer-user-card {
+  padding: 16px 18px;
+  background: linear-gradient(135deg, var(--primary-light) 0%, #f0fdfa 100%);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.drawer-user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.drawer-user-texts {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.drawer-user-texts strong {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.drawer-user-texts span {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.drawer-nav {
+  padding: 12px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.drawer-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all var(--transition-fast);
+}
+
+.drawer-link:hover,
+.drawer-link.active {
+  background-color: var(--primary-light);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.drawer-link svg {
+  flex-shrink: 0;
+}
+
+.drawer-link .badge-count {
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   ۳.۲. نوار ناوبری پایین صفحه برای موبایل (Bottom Navigation Bar)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background-color: var(--bg-surface);
+  border-top: 1px solid var(--border-light);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  z-index: 150;
+  align-items: stretch;
+  justify-content: space-around;
+  padding: 0 4px;
+}
+
+.bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  padding: 4px 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.bottom-nav-item svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  transition: transform var(--transition-fast);
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item.active {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.bottom-nav-item.active svg {
+  transform: translateY(-1px);
+}
+
+.bottom-nav-icon-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bottom-badge {
+  position: absolute;
+  top: -4px;
+  left: -8px;
+  min-width: 16px;
+  height: 16px;
+  font-size: 0.65rem;
+  padding: 0 4px;
+}
   width: 40px;
   height: 40px;
   border-radius: var(--radius-md);
@@ -1572,22 +1796,36 @@ ul, ol {
   .header-search.mobile-active {
     display: block;
     position: absolute;
-    top: 72px;
+    top: 60px;
     left: 0;
     right: 0;
     max-width: 100%;
-    padding: 10px 20px;
+    padding: 10px 16px;
     background-color: var(--bg-surface);
     border-bottom: 1px solid var(--border-light);
     box-shadow: var(--shadow-md);
+    z-index: 120;
   }
 
   .main-nav {
     display: none;
   }
 
+  .mobile-search-toggle,
   .mobile-menu-toggle {
     display: flex;
+  }
+
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  body {
+    padding-bottom: 58px;
+  }
+
+  .site-footer {
+    margin-bottom: 58px;
   }
 
   .catalog-layout {
@@ -1621,7 +1859,147 @@ ul, ol {
   }
 }
 
+@media (max-width: 640px) {
+  /* بهینه‌سازی سربرگ حالت مطالعه کتاب برای عرض‌های کوچک و ۳۶۰ پیکسل */
+  .reader-header {
+    padding: 8px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .reader-title-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 8px;
+  }
+
+  #btn-reader-exit {
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+    border-radius: var(--radius-full);
+  }
+
+  #reader-header-book-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+    text-align: left;
+  }
+
+  .reader-tools {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .reader-tool-group {
+    flex: 1;
+    display: flex;
+    gap: 2px;
+    padding: 3px;
+    justify-content: space-between;
+  }
+
+  .reader-tool-btn {
+    flex: 1;
+    padding: 5px 2px;
+    font-size: 0.75rem;
+    text-align: center;
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  .reader-content-wrapper {
+    margin: 16px auto;
+    padding: 0 14px 60px 14px;
+  }
+
+  .reader-book-title {
+    font-size: 1.4rem;
+  }
+
+  .reader-book-meta {
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+  }
+}
+
 @media (max-width: 480px) {
+  .site-header {
+    height: 60px;
+  }
+
+  .header-inner {
+    height: 60px;
+    gap: 8px;
+    padding: 0 10px;
+  }
+
+  .brand-logo {
+    font-size: 1.15rem;
+    gap: 6px;
+  }
+
+  .brand-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .header-actions {
+    gap: 6px;
+  }
+
+  .mobile-search-toggle,
+  .mobile-menu-toggle {
+    width: 34px;
+    height: 34px;
+  }
+
+  .btn-login-compact {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+
+  .btn-login-compact svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .user-menu-btn {
+    padding: 4px 6px;
+    gap: 6px;
+  }
+
+  .user-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 0.78rem;
+  }
+
+  .header-user-name {
+    max-width: 60px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.82rem;
+  }
+
+  .btn-logout {
+    padding: 4px 6px;
+    font-size: 0.75rem;
+  }
+
   .container {
     padding-left: 14px;
     padding-right: 14px;
@@ -1670,5 +2048,29 @@ ul, ol {
   .footer-grid {
     grid-template-columns: 1fr;
     gap: 24px;
+  }
+}
+
+@media (max-width: 380px) {
+  .header-inner {
+    padding: 0 6px;
+    gap: 4px;
+  }
+
+  .brand-logo span {
+    font-size: 1.05rem;
+  }
+
+  .login-btn-text {
+    display: none;
+  }
+
+  .btn-login-compact {
+    padding: 7px;
+    border-radius: 50%;
+  }
+
+  .header-user-name {
+    display: none;
   }
 }

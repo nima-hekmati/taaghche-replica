@@ -10,16 +10,16 @@
   // ۱. مدیریت وضعیت محلی و ذخیره‌سازی پایدار (State & LocalStorage)
   // =========================================================================
   const STORAGE_KEYS = {
-    USER: "taaghche_current_user",
-    PURCHASED: "taaghche_purchased_books",
-    FAVORITES: "taaghche_favorite_books",
-    READER_SETTINGS: "taaghche_reader_settings"
+    USERS_STORE: "taaghche_users_store",          // جدول کاربران با نگاشت بر اساس شماره همراه
+    ACTIVE_PHONE: "taaghche_active_user_phone",   // شماره همراه کاربر لاگین‌شده فعلی
+    READER_SETTINGS: "taaghche_reader_settings"   // تنظیمات قلم و تم کتابخوان
   };
 
   const AppState = {
-    currentUser: null,
-    purchasedIds: [],
-    favoriteIds: [],
+    currentUser: null,          // { name: string, phone: string } یا null در زمان خروج
+    purchasedIds: [],           // کتاب‌های دریافت‌شده/خریداری‌شده کاربر فعال
+    favoriteIds: [],            // نشان‌شده‌های کاربر فعال
+    usersStore: {},             // نگاشت وضعیت هر کاربر بر اساس شماره تلفن: { [phone]: { name, phone, purchasedIds, favoriteIds } }
     readerSettings: {
       fontSize: "md",
       theme: "light"
@@ -38,37 +38,65 @@
   };
 
   /**
-   * بارگذاری امن داده‌ها از LocalStorage با مدیریت خطا و مقادیر پیش‌فرض
+   * بارگذاری امن داده‌ها از LocalStorage با نگاشت وضعیت به شماره همراه هر کاربر
    */
   function loadPersistedState() {
+    // ۱. بارگذاری مخزن کاربران
     try {
-      const userStr = localStorage.getItem(STORAGE_KEYS.USER);
-      if (userStr) {
-        AppState.currentUser = JSON.parse(userStr);
+      const storeStr = localStorage.getItem(STORAGE_KEYS.USERS_STORE);
+      AppState.usersStore = storeStr ? JSON.parse(storeStr) : {};
+      if (typeof AppState.usersStore !== "object" || AppState.usersStore === null) {
+        AppState.usersStore = {};
       }
     } catch (e) {
-      console.warn("خطا در خواندن اطلاعات کاربر از حافظه محلی:", e);
+      console.warn("خطا در خواندن پایگاه داده کاربران:", e);
+      AppState.usersStore = {};
+    }
+
+    // ۲. مهاجرت داده‌های قدیمی (Migration) در صورت وجود داده از نسخه‌های قبلی
+    try {
+      const oldUserStr = localStorage.getItem("taaghche_current_user");
+      if (oldUserStr) {
+        const oldUser = JSON.parse(oldUserStr);
+        if (oldUser && oldUser.phone) {
+          const oldPurchased = JSON.parse(localStorage.getItem("taaghche_purchased_books") || "[]");
+          const oldFavs = JSON.parse(localStorage.getItem("taaghche_favorite_books") || "[]");
+          if (!AppState.usersStore[oldUser.phone]) {
+            AppState.usersStore[oldUser.phone] = {
+              name: oldUser.name,
+              phone: oldUser.phone,
+              purchasedIds: Array.isArray(oldPurchased) ? oldPurchased : [],
+              favoriteIds: Array.isArray(oldFavs) ? oldFavs : []
+            };
+            saveUsersStore();
+          }
+        }
+      }
+    } catch (e) {
+      // نادیده گرفتن خطای تبدیل
+    }
+
+    // ۳. بارگذاری کاربر فعال فعلی
+    try {
+      const activePhone = localStorage.getItem(STORAGE_KEYS.ACTIVE_PHONE);
+      if (activePhone && AppState.usersStore[activePhone]) {
+        const user = AppState.usersStore[activePhone];
+        AppState.currentUser = { name: user.name, phone: user.phone };
+        AppState.purchasedIds = Array.isArray(user.purchasedIds) ? [...user.purchasedIds] : [];
+        AppState.favoriteIds = Array.isArray(user.favoriteIds) ? [...user.favoriteIds] : [];
+      } else {
+        // وضعیت خروج / کاربر مهمان: کتابخانه و نشان‌شده‌ها کاملاً خالی هستند
+        AppState.currentUser = null;
+        AppState.purchasedIds = [];
+        AppState.favoriteIds = [];
+      }
+    } catch (e) {
       AppState.currentUser = null;
-    }
-
-    try {
-      const purchasedStr = localStorage.getItem(STORAGE_KEYS.PURCHASED);
-      AppState.purchasedIds = purchasedStr ? JSON.parse(purchasedStr) : [];
-      if (!Array.isArray(AppState.purchasedIds)) AppState.purchasedIds = [];
-    } catch (e) {
-      console.warn("خطا در خواندن کتاب‌های خریداری‌شده:", e);
       AppState.purchasedIds = [];
-    }
-
-    try {
-      const favStr = localStorage.getItem(STORAGE_KEYS.FAVORITES);
-      AppState.favoriteIds = favStr ? JSON.parse(favStr) : [];
-      if (!Array.isArray(AppState.favoriteIds)) AppState.favoriteIds = [];
-    } catch (e) {
-      console.warn("خطا در خواندن کتاب‌های مورد علاقه:", e);
       AppState.favoriteIds = [];
     }
 
+    // ۴. بارگذاری تنظیمات مطالعه
     try {
       const readerStr = localStorage.getItem(STORAGE_KEYS.READER_SETTINGS);
       if (readerStr) {
@@ -80,31 +108,38 @@
     }
   }
 
-  function saveUserState() {
+  function saveUsersStore() {
     try {
-      if (AppState.currentUser) {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(AppState.currentUser));
+      localStorage.setItem(STORAGE_KEYS.USERS_STORE, JSON.stringify(AppState.usersStore));
+    } catch (e) {
+      console.error("خطا در ذخیره مخزن کاربران:", e);
+    }
+  }
+
+  function saveCurrentUserActiveState() {
+    try {
+      if (AppState.currentUser && AppState.currentUser.phone) {
+        const phone = AppState.currentUser.phone;
+        localStorage.setItem(STORAGE_KEYS.ACTIVE_PHONE, phone);
+
+        if (!AppState.usersStore[phone]) {
+          AppState.usersStore[phone] = {
+            name: AppState.currentUser.name,
+            phone: phone,
+            purchasedIds: [],
+            favoriteIds: []
+          };
+        }
+
+        AppState.usersStore[phone].name = AppState.currentUser.name;
+        AppState.usersStore[phone].purchasedIds = AppState.purchasedIds;
+        AppState.usersStore[phone].favoriteIds = AppState.favoriteIds;
+        saveUsersStore();
       } else {
-        localStorage.removeItem(STORAGE_KEYS.USER);
+        localStorage.removeItem(STORAGE_KEYS.ACTIVE_PHONE);
       }
     } catch (e) {
-      console.error("ذخیره کاربر ناموفق بود:", e);
-    }
-  }
-
-  function savePurchasedState() {
-    try {
-      localStorage.setItem(STORAGE_KEYS.PURCHASED, JSON.stringify(AppState.purchasedIds));
-    } catch (e) {
-      console.error("ذخیره کتاب‌های خریداری‌شده ناموفق بود:", e);
-    }
-  }
-
-  function saveFavoritesState() {
-    try {
-      localStorage.setItem(STORAGE_KEYS.FAVORITES, JSON.stringify(AppState.favoriteIds));
-    } catch (e) {
-      console.error("ذخیره علاقه‌مندی‌ها ناموفق بود:", e);
+      console.error("خطا در ذخیره وضعیت کاربر فعال:", e);
     }
   }
 
@@ -133,7 +168,7 @@
   }
 
   /**
-   * تبدیل ارقام فارسی به انگلیسی (برای اعتبارسنجی ورودی شماره موبایل)
+   * تبدیل ارقام فارسی و عربی به انگلیسی (جهت اعتبارسنجی یکنواخت شماره موبایل)
    */
   function toEnglishDigits(str) {
     if (!str) return "";
@@ -178,20 +213,17 @@
 
     const toast = document.createElement("div");
     toast.className = `toast toast-${type}`;
-    
-    // استفاده امن از textContent
+
     const textSpan = document.createElement("span");
     textSpan.textContent = message;
     toast.appendChild(textSpan);
 
     container.appendChild(toast);
 
-    // انیمیشن ورود
     requestAnimationFrame(() => {
       toast.classList.add("show");
     });
 
-    // حذف خودکار بعد از ۳ ثانیه
     setTimeout(() => {
       toast.classList.remove("show");
       setTimeout(() => {
@@ -237,7 +269,6 @@
     favBtn.setAttribute("aria-label", isFav ? "حذف از نشان‌شده‌ها" : "افزودن به نشان‌شده‌ها");
     favBtn.setAttribute("title", isFav ? "حذف از نشان‌شده‌ها" : "افزودن به نشان‌شده‌ها");
 
-    // آیکون قلب SVG
     favBtn.innerHTML = `
       <svg viewBox="0 0 24 24">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -302,10 +333,17 @@
   }
 
   // =========================================================================
-  // ۴. مدیریت علاقه‌مندی‌ها و خرید (Favorites & Purchases)
+  // ۴. مدیریت علاقه‌مندی‌ها و خرید به صورت متصل به کاربر فعال
   // =========================================================================
 
   function toggleFavorite(bookId) {
+    // شرط اختصاص حالت به کاربر: اگر کاربر لاگین نباشد، فرم ورود باز می‌شود
+    if (!AppState.currentUser) {
+      showToast("برای افزودن به نشان‌شده‌ها و ذخیره در حساب خود، لطفاً وارد شوید.", "error");
+      openLoginModal();
+      return;
+    }
+
     const index = AppState.favoriteIds.indexOf(bookId);
     const book = BOOKS_DATA.find((b) => b.id === bookId);
     const bookTitle = book ? book.title : "کتاب";
@@ -318,12 +356,22 @@
       showToast(`«${bookTitle}» به نشان‌شده‌ها اضافه شد.`, "success");
     }
 
-    saveFavoritesState();
+    // ذخیره در سوابق کاربر مربوطه بر اساس شماره همراه
+    saveCurrentUserActiveState();
     updateUIBadges();
 
     // به‌روزرسانی زنده کارت‌ها در صفحه فعلی
+    updateAllFavoriteButtons(bookId);
+
+    // اگر در نمای کتابخانه هستیم، رندر مجدد تب علاقه‌مندی‌ها
+    if (AppState.currentView === "library") {
+      renderLibraryView("favorites");
+    }
+  }
+
+  function updateAllFavoriteButtons(bookId) {
+    const isFav = AppState.favoriteIds.includes(bookId);
     document.querySelectorAll(`.book-card[data-book-id="${bookId}"] .card-favorite-btn`).forEach((btn) => {
-      const isFav = AppState.favoriteIds.includes(bookId);
       btn.classList.toggle("favorited", isFav);
       btn.setAttribute("aria-label", isFav ? "حذف از نشان‌شده‌ها" : "افزودن به نشان‌شده‌ها");
     });
@@ -331,15 +379,9 @@
     // در صورت بودن در صفحه جزییات کتاب
     const detailFavBtn = document.getElementById("btn-detail-favorite");
     if (detailFavBtn && AppState.selectedBookId === bookId) {
-      const isFav = AppState.favoriteIds.includes(bookId);
       detailFavBtn.classList.toggle("btn-danger", isFav);
       detailFavBtn.classList.toggle("btn-outline", !isFav);
       detailFavBtn.textContent = isFav ? "❤️ حذف از نشان‌شده‌ها" : "🤍 افزودن به نشان‌شده‌ها";
-    }
-
-    // اگر در نمای کتابخانه هستیم، رندر مجدد تب علاقه‌مندی‌ها
-    if (AppState.currentView === "library") {
-      renderLibraryView();
     }
   }
 
@@ -347,7 +389,7 @@
     const book = BOOKS_DATA.find((b) => b.id === bookId);
     if (!book) return;
 
-    // بررسی آیا قبلاً دریافت شده است
+    // بررسی آیا قبلاً توسط این کاربر دریافت شده است
     if (AppState.purchasedIds.includes(book.id)) {
       if (book.sampleText && book.sampleText.length > 0) {
         navigateToReader(book.id);
@@ -357,7 +399,7 @@
       return;
     }
 
-    // شرط احراز هویت کاربر
+    // شرط احراز هویت کاربر برای دریافت یا خرید
     if (!AppState.currentUser) {
       showToast("برای دریافت یا خرید کتاب، ابتدا وارد حساب کاربری خود شوید.", "error");
       openLoginModal();
@@ -379,9 +421,10 @@
   }
 
   function addBookToPurchased(bookId) {
+    if (!AppState.currentUser) return;
     if (!AppState.purchasedIds.includes(bookId)) {
       AppState.purchasedIds.push(bookId);
-      savePurchasedState();
+      saveCurrentUserActiveState();
       updateUIBadges();
     }
   }
@@ -784,13 +827,12 @@
       sampleBtn.addEventListener("click", () => navigateToReader(book.id));
     }
 
-    // رندر کتاب‌های مرتبط (حداقل ۳ کتاب از همان دسته‌بندی به جز خود کتاب)
+    // رندر کتاب‌های مرتبط
     const relatedGrid = document.getElementById("related-books-grid");
     if (relatedGrid) {
       relatedGrid.innerHTML = "";
       const related = BOOKS_DATA.filter((b) => b.category === book.category && b.id !== book.id).slice(0, 4);
       if (related.length === 0) {
-        // در صورت کمبود، کتاب‌های عمومی پرامتیاز
         const fallback = BOOKS_DATA.filter((b) => b.id !== book.id).slice(0, 4);
         fallback.forEach((b) => relatedGrid.appendChild(createBookCardElement(b)));
       } else {
@@ -824,16 +866,23 @@
     const books = BOOKS_DATA.filter((b) => bookIds.includes(b.id));
 
     if (books.length === 0) {
-      const emptyTitle = isPurchasedTab
+      const emptyTitle = !AppState.currentUser
+        ? "جهت مشاهده کتابخانه و علاقه‌مندی‌های خود، لطفاً وارد حساب شوید."
+        : isPurchasedTab
         ? "هنوز هیچ کتابی در کتابخانه خود دریافت نکرده‌اید."
         : "هیچ کتابی در فهرست علاقه‌مندی‌های شما قرار ندارد.";
-      const emptyActionText = isPurchasedTab ? "مشاهده کتاب‌های رایگان" : "گشت‌وگذار در میان کتاب‌ها";
+
+      const emptyActionText = !AppState.currentUser
+        ? "ورود به حساب کاربری"
+        : isPurchasedTab
+        ? "مشاهده کتاب‌های رایگان"
+        : "گشت‌وگذار در میان کتاب‌ها";
 
       grid.innerHTML = `
         <div class="empty-state">
-          <div class="empty-state-icon">${isPurchasedTab ? "📚" : "🤍"}</div>
+          <div class="empty-state-icon">${!AppState.currentUser ? "🔒" : isPurchasedTab ? "📚" : "🤍"}</div>
           <h3 class="empty-state-title">${emptyTitle}</h3>
-          <p class="empty-state-text">با گشت‌وگذار در فهرست کتاب‌ها و انتخاب آثار مورد علاقه خود، کتابخانه شخصی‌تان را بسازید.</p>
+          <p class="empty-state-text">با ورود به حساب و ثبت آثار محبوب، کتابخانه دیجیتال شما همیشه در دسترس خواهد بود.</p>
           <button type="button" class="btn btn-primary" id="btn-library-browse">
             ${emptyActionText}
           </button>
@@ -843,12 +892,15 @@
       const browseBtn = document.getElementById("btn-library-browse");
       if (browseBtn) {
         browseBtn.addEventListener("click", () => {
-          if (isPurchasedTab) {
+          if (!AppState.currentUser) {
+            openLoginModal();
+          } else if (isPurchasedTab) {
             applyCatalogFilters({ priceType: "free", category: "all", searchQuery: "" });
+            navigateTo("catalog");
           } else {
             resetAllFilters();
+            navigateTo("catalog");
           }
-          navigateTo("catalog");
         });
       }
       return;
@@ -876,7 +928,6 @@
     const mainTitle = document.getElementById("reader-title");
     const authorEl = document.getElementById("reader-author");
     const bodyEl = document.getElementById("reader-paragraphs-body");
-    const container = document.getElementById("reader-container");
 
     if (headerTitle) headerTitle.textContent = book.title;
     if (mainTitle) mainTitle.textContent = book.title;
@@ -893,7 +944,6 @@
       });
     }
 
-    // اعمال تنظیمات اندازه فونت و تم
     applyReaderSettings();
   }
 
@@ -925,7 +975,8 @@
   function navigateTo(viewName, params = {}) {
     AppState.currentView = viewName;
 
-    // بستن منوی موبایل در صورت باز بودن
+    // بستن منوهای شناور موبایل
+    closeMobileDrawer();
     const searchContainer = document.getElementById("header-search-container");
     if (searchContainer) searchContainer.classList.remove("mobile-active");
 
@@ -934,9 +985,15 @@
       view.style.display = "none";
     });
 
-    // به‌روزرسانی فعال بودن پیوندهای هدر
+    // به‌روزرسانی فعال بودن پیوندهای هدر، سایدبار کشویی و نوار پایین موبایل
     document.querySelectorAll(".nav-link").forEach((link) => {
       link.classList.remove("active");
+    });
+    document.querySelectorAll(".drawer-link").forEach((link) => {
+      link.classList.remove("active");
+    });
+    document.querySelectorAll(".bottom-nav-item").forEach((item) => {
+      item.classList.remove("active");
     });
 
     // نمایش نمای مورد نظر
@@ -945,25 +1002,37 @@
       targetView.style.display = "block";
     }
 
-    // اگر نمای مطالعه است، هدر و فوتر پنهان شوند
+    // اگر نمای مطالعه است، هدر، فوتر و نوار پایین موبایل پنهان شوند
     const header = document.querySelector(".site-header");
     const footer = document.querySelector(".site-footer");
+    const bottomNav = document.getElementById("mobile-bottom-nav");
     const isReader = viewName === "reader";
 
     if (header) header.style.display = isReader ? "none" : "block";
     if (footer) footer.style.display = isReader ? "none" : "block";
+    if (bottomNav) bottomNav.style.display = isReader ? "none" : "";
 
     window.scrollTo({ top: 0, behavior: "smooth" });
 
-    // مدیریت وضعیت هر نما
+    // مدیریت فعال‌سازی تب‌ها و آدرس
     if (viewName === "home") {
       const homeLink = document.getElementById("nav-link-home");
       if (homeLink) homeLink.classList.add("active");
+      const dLink = document.getElementById("drawer-link-home");
+      if (dLink) dLink.classList.add("active");
+      const bNav = document.getElementById("bnav-home");
+      if (bNav) bNav.classList.add("active");
+
       renderHomeView();
       window.location.hash = "home";
     } else if (viewName === "catalog") {
       const catLink = document.getElementById("nav-link-catalog");
       if (catLink) catLink.classList.add("active");
+      const dLink = document.getElementById("drawer-link-catalog");
+      if (dLink) dLink.classList.add("active");
+      const bNav = document.getElementById("bnav-catalog");
+      if (bNav) bNav.classList.add("active");
+
       renderCatalogView();
       window.location.hash = "catalog";
     } else if (viewName === "book") {
@@ -973,6 +1042,11 @@
     } else if (viewName === "library") {
       const libLink = document.getElementById("nav-link-library");
       if (libLink) libLink.classList.add("active");
+      const dLink = document.getElementById("drawer-link-library");
+      if (dLink) dLink.classList.add("active");
+      const bNav = document.getElementById("bnav-library");
+      if (bNav) bNav.classList.add("active");
+
       renderLibraryView(params.tab || "purchased");
       window.location.hash = "library";
     } else if (viewName === "reader") {
@@ -990,14 +1064,10 @@
     navigateTo("reader", { id: bookId });
   }
 
-  /**
-   * تجزیه هش و پارامترهای آدرس مرورگر برای پشتیبانی از لینک‌های مستقیم و رفرش
-   */
   function handleUrlRouting() {
     const searchParams = new URLSearchParams(window.location.search);
     const hash = window.location.hash.replace(/^#/, "");
 
-    // پشتیبانی از باز کردن با پارامتر ?book=id
     if (searchParams.has("book")) {
       navigateToBookDetails(searchParams.get("book"));
       return;
@@ -1031,12 +1101,11 @@
       return;
     }
 
-    // پیش‌فرض: صفحه اصلی
     navigateTo("home");
   }
 
   // =========================================================================
-  // ۷. احراز هویت نمایشی و اعتبارسنجی فرم (Authentication & Validation)
+  // ۷. احراز هویت اختصاصی کاربر و نگاشت به شماره همراه
   // =========================================================================
 
   function openLoginModal() {
@@ -1109,32 +1178,83 @@
 
     if (!isValid) return;
 
-    // ورود موفقیت‌آمیز
+    // ثبت کاربر جاری و بازیابی داده‌های اختصاصی شماره همراه وی
     AppState.currentUser = {
       name: rawName,
       phone: normalizedDigits
     };
 
-    saveUserState();
-    updateUIUserSection();
-    closeLoginModal();
-    showToast(`خوش آمدید، ${rawName}! ورود شما با موفقیت انجام شد.`, "success");
-
-    // به‌روزرسانی صفحه جزییات کتاب در صورت باز بودن
-    if (AppState.currentView === "book" && AppState.selectedBookId) {
-      renderBookDetailsView(AppState.selectedBookId);
+    if (AppState.usersStore[normalizedDigits]) {
+      // این شماره قبلاً ثبت شده: بازیابی کتاب‌ها و علاقه‌مندی‌های همان شماره
+      const record = AppState.usersStore[normalizedDigits];
+      record.name = rawName; // به‌روزرسانی نام
+      AppState.purchasedIds = Array.isArray(record.purchasedIds) ? [...record.purchasedIds] : [];
+      AppState.favoriteIds = Array.isArray(record.favoriteIds) ? [...record.favoriteIds] : [];
+    } else {
+      // کاربر جدید با وضعیت خالی
+      AppState.purchasedIds = [];
+      AppState.favoriteIds = [];
+      AppState.usersStore[normalizedDigits] = {
+        name: rawName,
+        phone: normalizedDigits,
+        purchasedIds: [],
+        favoriteIds: []
+      };
     }
+
+    saveCurrentUserActiveState();
+    updateUIUserSection();
+    updateUIBadges();
+    closeLoginModal();
+    closeMobileDrawer();
+
+    // به‌روزرسانی نماهای مختلف با داده‌های کاربر جدید
+    refreshAllViewsForUserState();
+
+    showToast(`خوش آمدید، ${rawName}! ورود شما با موفقیت انجام شد.`, "success");
   }
 
   function handleLogout() {
     const prevName = AppState.currentUser ? AppState.currentUser.name : "";
-    AppState.currentUser = null;
-    saveUserState();
-    updateUIUserSection();
-    showToast(`${prevName} عزیز، با موفقیت از حساب کاربری خارج شدید.`, "success");
 
+    // خروج: خالی کردن متغیرهای حافظه برنامه
+    AppState.currentUser = null;
+    AppState.purchasedIds = [];
+    AppState.favoriteIds = [];
+
+    // حذف کلید شماره فعال در مرورگر تا وضعیت لاگ‌اوت ثبت شود
+    localStorage.removeItem(STORAGE_KEYS.ACTIVE_PHONE);
+
+    updateUIUserSection();
+    updateUIBadges();
+    closeMobileDrawer();
+
+    // به‌روزرسانی همه نماها به وضعیت خالی
+    refreshAllViewsForUserState();
+
+    showToast(prevName ? `${prevName} عزیز، با موفقیت از حساب کاربری خارج شدید.` : "با موفقیت از حساب کاربری خارج شدید.", "success");
+  }
+
+  function refreshAllViewsForUserState() {
+    // ۱. به‌روزرسانی تمام کارت‌های کتاب صفحه فعلی
+    document.querySelectorAll(".book-card").forEach((card) => {
+      const bId = card.dataset.bookId;
+      const isFav = AppState.favoriteIds.includes(bId);
+      const favBtn = card.querySelector(".card-favorite-btn");
+      if (favBtn) {
+        favBtn.classList.toggle("favorited", isFav);
+        favBtn.setAttribute("aria-label", isFav ? "حذف از نشان‌شده‌ها" : "افزودن به نشان‌شده‌ها");
+      }
+    });
+
+    // ۲. در صورت بودن در صفحه جزییات کتاب
     if (AppState.currentView === "book" && AppState.selectedBookId) {
       renderBookDetailsView(AppState.selectedBookId);
+    }
+
+    // ۳. در صورت بودن در صفحه کتابخانه
+    if (AppState.currentView === "library") {
+      renderLibraryView();
     }
   }
 
@@ -1144,6 +1264,15 @@
     const userNameSpan = document.getElementById("header-user-name");
     const userAvatar = document.getElementById("header-user-avatar");
 
+    // کارت سایدبار کشویی موبایل
+    const drawerUserName = document.getElementById("drawer-user-name");
+    const drawerUserPhone = document.getElementById("drawer-user-phone");
+    const drawerUserAvatar = document.getElementById("drawer-user-avatar");
+    const drawerAuthBtn = document.getElementById("btn-drawer-auth-action");
+
+    // برچسب ناوبری پایین موبایل
+    const bnavUserLabel = document.getElementById("bnav-user-label");
+
     if (AppState.currentUser) {
       if (loggedOutBox) loggedOutBox.style.display = "none";
       if (loggedInBox) loggedInBox.style.display = "flex";
@@ -1151,9 +1280,32 @@
       if (userAvatar) {
         userAvatar.textContent = AppState.currentUser.name.charAt(0) || "ک";
       }
+
+      if (drawerUserName) drawerUserName.textContent = AppState.currentUser.name;
+      if (drawerUserPhone) drawerUserPhone.textContent = toPersianDigits(AppState.currentUser.phone);
+      if (drawerUserAvatar) drawerUserAvatar.textContent = AppState.currentUser.name.charAt(0) || "ک";
+      if (drawerAuthBtn) {
+        drawerAuthBtn.textContent = "خروج از حساب";
+        drawerAuthBtn.className = "btn btn-danger btn-sm";
+      }
+
+      if (bnavUserLabel) {
+        const shortName = AppState.currentUser.name.split(" ")[0];
+        bnavUserLabel.textContent = shortName || "حساب من";
+      }
     } else {
       if (loggedOutBox) loggedOutBox.style.display = "block";
       if (loggedInBox) loggedInBox.style.display = "none";
+
+      if (drawerUserName) drawerUserName.textContent = "کاربر مهمان";
+      if (drawerUserPhone) drawerUserPhone.textContent = "جهت دریافت کتاب وارد شوید";
+      if (drawerUserAvatar) drawerUserAvatar.textContent = "م";
+      if (drawerAuthBtn) {
+        drawerAuthBtn.textContent = "ورود به حساب";
+        drawerAuthBtn.className = "btn btn-outline btn-sm";
+      }
+
+      if (bnavUserLabel) bnavUserLabel.textContent = "ورود";
     }
   }
 
@@ -1161,15 +1313,47 @@
     const headerCount = document.getElementById("header-library-count");
     const purchasedCount = document.getElementById("library-purchased-count");
     const favoritesCount = document.getElementById("library-favorites-count");
+    const drawerCount = document.getElementById("drawer-library-count");
+    const bnavCount = document.getElementById("bnav-library-count");
 
-    const totalCount = AppState.purchasedIds.length;
-    if (headerCount) headerCount.textContent = toPersianDigits(totalCount);
-    if (purchasedCount) purchasedCount.textContent = toPersianDigits(AppState.purchasedIds.length);
-    if (favoritesCount) favoritesCount.textContent = toPersianDigits(AppState.favoriteIds.length);
+    const totalPurchased = AppState.purchasedIds.length;
+    const totalFavorites = AppState.favoriteIds.length;
+
+    if (headerCount) headerCount.textContent = toPersianDigits(totalPurchased);
+    if (drawerCount) drawerCount.textContent = toPersianDigits(totalPurchased);
+    if (bnavCount) bnavCount.textContent = toPersianDigits(totalPurchased);
+    if (purchasedCount) purchasedCount.textContent = toPersianDigits(totalPurchased);
+    if (favoritesCount) favoritesCount.textContent = toPersianDigits(totalFavorites);
   }
 
   // =========================================================================
-  // ۸. پنجره خرید شبیه‌سازی‌شده (Purchase Modal)
+  // ۸. مدیریت سایدبار کشویی موبایل (Mobile Drawer)
+  // =========================================================================
+
+  function openMobileDrawer() {
+    const drawer = document.getElementById("mobile-drawer");
+    const overlay = document.getElementById("mobile-drawer-overlay");
+    if (drawer && overlay) {
+      drawer.classList.add("active");
+      overlay.classList.add("active");
+      drawer.setAttribute("aria-hidden", "false");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+  }
+
+  function closeMobileDrawer() {
+    const drawer = document.getElementById("mobile-drawer");
+    const overlay = document.getElementById("mobile-drawer-overlay");
+    if (drawer && overlay) {
+      drawer.classList.remove("active");
+      overlay.classList.remove("active");
+      drawer.setAttribute("aria-hidden", "true");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  // =========================================================================
+  // ۹. پنجره خرید شبیه‌سازی‌شده (Purchase Modal)
   // =========================================================================
 
   let pendingPurchaseBookId = null;
@@ -1218,7 +1402,7 @@
   }
 
   // =========================================================================
-  // ۹. راه‌اندازی و رویدادهای عمومی (Event Listeners & Initialization)
+  // ۱۰. راه‌اندازی و رویدادهای عمومی (Event Listeners & Initialization)
   // =========================================================================
 
   function setupEventListeners() {
@@ -1235,10 +1419,57 @@
     const navLibrary = document.getElementById("nav-link-library");
     if (navLibrary) navLibrary.addEventListener("click", (e) => { e.preventDefault(); navigateTo("library"); });
 
-    // منوی موبایل
+    // باز و بسته کردن منوی کشویی سایدبار موبایل
     const mobileMenuBtn = document.getElementById("btn-mobile-menu");
     if (mobileMenuBtn) {
-      mobileMenuBtn.addEventListener("click", () => {
+      mobileMenuBtn.addEventListener("click", openMobileDrawer);
+    }
+
+    const closeDrawerBtn = document.getElementById("btn-close-drawer");
+    if (closeDrawerBtn) {
+      closeDrawerBtn.addEventListener("click", closeMobileDrawer);
+    }
+
+    const drawerOverlay = document.getElementById("mobile-drawer-overlay");
+    if (drawerOverlay) {
+      drawerOverlay.addEventListener("click", closeMobileDrawer);
+    }
+
+    // پیوندهای داخل منوی سایدبار موبایل
+    const dHome = document.getElementById("drawer-link-home");
+    if (dHome) dHome.addEventListener("click", (e) => { e.preventDefault(); navigateTo("home"); });
+
+    const dCatalog = document.getElementById("drawer-link-catalog");
+    if (dCatalog) dCatalog.addEventListener("click", (e) => { e.preventDefault(); navigateTo("catalog"); });
+
+    const dLibrary = document.getElementById("drawer-link-library");
+    if (dLibrary) dLibrary.addEventListener("click", (e) => { e.preventDefault(); navigateTo("library"); });
+
+    const dFree = document.getElementById("drawer-link-free");
+    if (dFree) {
+      dFree.addEventListener("click", (e) => {
+        e.preventDefault();
+        applyCatalogFilters({ priceType: "free", category: "all", searchQuery: "" });
+        navigateTo("catalog");
+      });
+    }
+
+    const drawerAuthBtn = document.getElementById("btn-drawer-auth-action");
+    if (drawerAuthBtn) {
+      drawerAuthBtn.addEventListener("click", () => {
+        if (AppState.currentUser) {
+          handleLogout();
+        } else {
+          closeMobileDrawer();
+          openLoginModal();
+        }
+      });
+    }
+
+    // دکمه باز کردن جستجوی موبایل در هدر
+    const mobileSearchBtn = document.getElementById("btn-mobile-search-toggle");
+    if (mobileSearchBtn) {
+      mobileSearchBtn.addEventListener("click", () => {
         const searchContainer = document.getElementById("header-search-container");
         if (searchContainer) {
           searchContainer.classList.toggle("mobile-active");
@@ -1246,6 +1477,27 @@
           if (input && searchContainer.classList.contains("mobile-active")) {
             input.focus();
           }
+        }
+      });
+    }
+
+    // نوار ناوبری پایین صفحه برای موبایل (Bottom Nav)
+    const bHome = document.getElementById("bnav-home");
+    if (bHome) bHome.addEventListener("click", (e) => { e.preventDefault(); navigateTo("home"); });
+
+    const bCatalog = document.getElementById("bnav-catalog");
+    if (bCatalog) bCatalog.addEventListener("click", (e) => { e.preventDefault(); navigateTo("catalog"); });
+
+    const bLibrary = document.getElementById("bnav-library");
+    if (bLibrary) bLibrary.addEventListener("click", (e) => { e.preventDefault(); navigateTo("library"); });
+
+    const bUser = document.getElementById("bnav-user");
+    if (bUser) {
+      bUser.addEventListener("click", () => {
+        if (AppState.currentUser) {
+          openMobileDrawer();
+        } else {
+          openLoginModal();
         }
       });
     }
@@ -1288,7 +1540,7 @@
       btn.addEventListener("click", () => {
         const trackId = btn.getAttribute("data-shelf-prev");
         const track = document.getElementById(trackId);
-        if (track) track.scrollBy({ left: 300, behavior: "smooth" }); // در جهت RTL
+        if (track) track.scrollBy({ left: 300, behavior: "smooth" });
       });
     });
 
@@ -1394,11 +1646,17 @@
       });
     });
 
-    // بستن پنجره‌ها و خروج از مطالعه با کلید Escape
+    // بستن پنجره‌ها و منوها با کلید Escape
     window.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         const loginModal = document.getElementById("login-modal");
         const purchaseModal = document.getElementById("purchase-modal");
+        const drawer = document.getElementById("mobile-drawer");
+
+        if (drawer && drawer.classList.contains("active")) {
+          closeMobileDrawer();
+          return;
+        }
 
         if (loginModal && loginModal.classList.contains("active")) {
           closeLoginModal();
@@ -1435,7 +1693,6 @@
     handleUrlRouting();
   }
 
-  // اجرای برنامه پس از بارگذاری DOM
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", initApp);
   } else {

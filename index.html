@@ -62,27 +62,82 @@
 
       <!-- اقدامات کاربری سربرگ -->
       <div class="header-actions">
+        <!-- دکمه باز کردن جستجو در موبایل -->
+        <button type="button" class="mobile-search-toggle" id="btn-mobile-search-toggle" aria-label="جستجوی کتاب">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+        </button>
+
         <div id="user-logged-out-box">
-          <button type="button" class="btn btn-outline" id="btn-open-login" aria-haspopup="dialog">
+          <button type="button" class="btn btn-outline btn-login-compact" id="btn-open-login" aria-haspopup="dialog">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>ورود / ثبت‌نام</span>
+            <span class="login-btn-text">ورود / ثبت‌نام</span>
           </button>
         </div>
-        <div id="user-logged-in-box" style="display: none; align-items: center; gap: 8px;">
-          <div class="user-menu-btn">
+        <div id="user-logged-in-box" style="display: none; align-items: center; gap: 6px;">
+          <div class="user-menu-btn" id="header-user-btn" role="button" tabindex="0">
             <div class="user-avatar" id="header-user-avatar" aria-hidden="true">ک</div>
-            <span id="header-user-name">کاربر</span>
+            <span id="header-user-name" class="header-user-name">کاربر</span>
           </div>
           <button type="button" class="btn-logout" id="btn-logout" aria-label="خروج از حساب کاربری">خروج</button>
         </div>
 
-        <!-- دکمه منوی موبایل -->
-        <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-label="منوی موبایل" aria-expanded="false">
+        <!-- دکمه منوی کشویی موبایل -->
+        <button type="button" class="mobile-menu-toggle" id="btn-mobile-menu" aria-label="منوی گزینه‌ها" aria-expanded="false">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
       </div>
     </div>
   </header>
+
+  <!-- منوی کشویی سایدبار موبایل (Mobile Drawer) -->
+  <div class="mobile-drawer-overlay" id="mobile-drawer-overlay" aria-hidden="true"></div>
+  <aside class="mobile-drawer" id="mobile-drawer" aria-label="منوی ناوبری موبایل" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="brand-logo">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+        </div>
+        <span>طاقچه</span>
+      </div>
+      <button type="button" class="drawer-close-btn" id="btn-close-drawer" aria-label="بستن منو">✕</button>
+    </div>
+
+    <div class="drawer-user-card" id="drawer-user-card">
+      <div class="drawer-user-info">
+        <div class="user-avatar" id="drawer-user-avatar">م</div>
+        <div class="drawer-user-texts">
+          <strong id="drawer-user-name">کاربر مهمان</strong>
+          <span id="drawer-user-phone">جهت دریافت کتاب وارد شوید</span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-outline btn-sm" id="btn-drawer-auth-action">ورود به حساب</button>
+    </div>
+
+    <nav class="drawer-nav">
+      <a href="#home" class="drawer-link active" id="drawer-link-home">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>صفحه اصلی</span>
+      </a>
+      <a href="#catalog" class="drawer-link" id="drawer-link-catalog">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        <span>فهرست و جستجوی کتاب‌ها</span>
+      </a>
+      <a href="#library" class="drawer-link" id="drawer-link-library">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span>کتابخانه من</span>
+        <span class="badge-count" id="drawer-library-count">۰</span>
+      </a>
+      <a href="#catalog" class="drawer-link" id="drawer-link-free" data-shelf-filter="free">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M8 10l8 4"/></svg>
+        <span>کتاب‌های رایگان</span>
+      </a>
+    </nav>
+  </aside>
 
   <!-- ریشه اصلی اپلیکیشن (صفحات و نماها) -->
   <main id="app-root" role="main">
@@ -479,6 +534,29 @@
       </div>
     </div>
   </footer>
+
+  <!-- نوار ناوبری پایین صفحه برای موبایل (Bottom Navigation Bar) -->
+  <nav class="mobile-bottom-nav" id="mobile-bottom-nav" aria-label="ناوبری سریع موبایل">
+    <a href="#home" class="bottom-nav-item active" id="bnav-home">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span>صفحه اصلی</span>
+    </a>
+    <a href="#catalog" class="bottom-nav-item" id="bnav-catalog">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+      <span>کتاب‌ها</span>
+    </a>
+    <a href="#library" class="bottom-nav-item" id="bnav-library">
+      <div class="bottom-nav-icon-wrap">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>
+        <span class="badge-count bottom-badge" id="bnav-library-count">۰</span>
+      </div>
+      <span>کتابخانه</span>
+    </a>
+    <button type="button" class="bottom-nav-item" id="bnav-user" aria-label="حساب کاربری">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span id="bnav-user-label">حساب من</span>
+    </button>
+  </nav>
 
   <!-- اسکریپت داده‌ها و منطق برنامه -->
   <script src="js/books.js"></script>
